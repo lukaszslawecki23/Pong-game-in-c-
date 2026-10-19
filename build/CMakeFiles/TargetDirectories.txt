@@ -1,0 +1,8 @@
+C:/projekt_gra/build/CMakeFiles/MojaGra.dir
+C:/projekt_gra/build/CMakeFiles/edit_cache.dir
+C:/projekt_gra/build/CMakeFiles/rebuild_cache.dir
+C:/projekt_gra/build/external/SDL/CMakeFiles/SDL3-shared.dir
+C:/projekt_gra/build/external/SDL/CMakeFiles/SDL3_test.dir
+C:/projekt_gra/build/external/SDL/CMakeFiles/SDL_uclibc.dir
+C:/projekt_gra/build/external/SDL/CMakeFiles/edit_cache.dir
+C:/projekt_gra/build/external/SDL/CMakeFiles/rebuild_cache.dir
