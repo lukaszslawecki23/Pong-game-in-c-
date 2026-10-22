@@ -9,6 +9,7 @@ set(SDL_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(external/SDL)
 
 add_executable(${PROJECT_NAME} src/main.cpp
-    src/gracz.cpp)
+    src/gracz.cpp
+    src/manager.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)

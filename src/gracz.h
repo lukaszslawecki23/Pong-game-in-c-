@@ -31,6 +31,6 @@ class Kolo
         void rysuj(SDL_Renderer* renderer);
         void czyKoliduje(const SDL_FRect& prostokat);
         void aktualizuj();
-        bool gol();
         void resetuj();
+        float polozenieX();
 };

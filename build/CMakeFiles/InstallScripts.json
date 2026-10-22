@@ -1,8 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/projekt_gra/build/cmake_install.cmake",
-		"C:/projekt_gra/build/external/SDL/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

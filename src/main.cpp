@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include "gracz.h"
+#include "manager.h"
 using std::endl;
 using std::cerr;
 
@@ -39,11 +40,11 @@ int main(int argc, char* argv[]) {
     SDL_Event event;
 
     int r = 30, g = 120, b = 90;
-    int temp_r = 90, temp_g = 30, temp_b = 30;
 
     Gracz gracz1(80.0f, 465.0f, 40.0f, 150.0f, 10.5f, true);
     Gracz gracz2(1800.0f, 465.0f, 40.0f, 150.0f, 10.5f, false);
     Kolo pilka(950.0f, 540.0f, 15.0f);
+    Points manager;
 
     while(graDziala)
     {
@@ -60,12 +61,21 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        if (pilka.gol())
+        if (manager.czyGol(pilka))
         {
+            if (manager.punktyGracz1 > manager.punktyGracz2)
+            {
+                r = 30;
+                g = 120;
+                b = 90;
+            }
+            if (manager.punktyGracz1 < manager.punktyGracz2)
+            {
+                r = 90;
+                g = 30;
+                b = 30;
+            }
             pilka.resetuj();
-            std::swap(r, temp_r);
-            std::swap(g, temp_g);
-            std::swap(b, temp_b);
         }
 
         gracz1.aktualizuj();
@@ -81,6 +91,7 @@ int main(int argc, char* argv[]) {
         gracz1.rysuj(renderer);
         gracz2.rysuj(renderer);
         pilka.rysuj(renderer);
+        manager.rysuj(renderer);
 
         SDL_RenderPresent(renderer);
         SDL_Delay(16);

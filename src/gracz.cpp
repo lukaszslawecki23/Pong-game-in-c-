@@ -1,5 +1,6 @@
 #include "gracz.h"
 #include <algorithm>
+#include <random>
 
 Gracz::Gracz(float start_x, float start_y, float szerokosc, float wysokosc, float predkosc, bool wsad)
 {
@@ -81,8 +82,13 @@ void Kolo::czyKoliduje(const SDL_FRect& prostokat)
 void Kolo::aktualizuj()
 {
     const bool* klawisze = SDL_GetKeyboardState(nullptr);
-    if (klawisze[SDL_SCANCODE_SPACE])
+    if (klawisze[SDL_SCANCODE_SPACE] && !wRuchu)
     {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+
+        std::uniform_real_distribution<float> dist(-2.0f, 2.0f);
+        predkoscY = dist(gen);
         wRuchu = true;
     }
 
@@ -90,6 +96,7 @@ void Kolo::aktualizuj()
     {
         x += predkoscX;
         y += predkoscY;
+        predkoscX *= 1.0003f;
 
         if (y - promien <= 0.0f)
         {
@@ -105,19 +112,23 @@ void Kolo::aktualizuj()
     } 
 }
 
-bool Kolo::gol()
-{
-    if (x >= 1920 || x <= 0)
-    {
-        return true;
-    }
-    else return false;
-}
-
 void Kolo::resetuj() 
 {
     x = startX;
     y = startY;
     wRuchu = false;
-    predkoscX *= -1.0f;
+    
+    if (predkoscX < 0.0f)
+    {
+        predkoscX = 9.0f;
+    }
+    else
+    {
+        predkoscX = -9.0f;
+    }
+}
+
+float Kolo::polozenieX() 
+{
+    return x;
 }

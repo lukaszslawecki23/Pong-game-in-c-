@@ -1,0 +1,9 @@
+build/
+bin/
+out/
+*.exe
+*.o
+*.obj
+*.dll
+.vscode/
+external/
