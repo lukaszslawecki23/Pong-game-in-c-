@@ -63,6 +63,8 @@ int main(int argc, char* argv[]) {
 
         if (manager.czyGol(pilka))
         {
+            if (manager.koniecGry()) graDziala = false;
+        
             if (manager.punktyGracz1 > manager.punktyGracz2)
             {
                 r = 30;

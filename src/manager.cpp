@@ -27,3 +27,11 @@ void Points::rysuj(SDL_Renderer* renderer)
     SDL_RenderDebugTextFormat(renderer, 221.0f, 10.0f, "%d : %d", punktyGracz1, punktyGracz2);
     SDL_SetRenderScale(renderer, 1.0f, 1.0f);
 }
+
+bool Points::koniecGry()
+{
+    if (punktyGracz1 >= 11 && punktyGracz1 - punktyGracz2 >= 2) return true;
+    if (punktyGracz2 >= 11 && punktyGracz2 - punktyGracz1 >= 2) return true;
+
+    return false;
+}

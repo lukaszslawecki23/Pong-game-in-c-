@@ -11,4 +11,5 @@ class Points
         Points();
         bool czyGol(Kolo pilka);
         void rysuj(SDL_Renderer* renderer);
+        bool koniecGry();
 };
