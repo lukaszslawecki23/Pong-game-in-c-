@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     Gracz gracz1(80.0f, 465.0f, 40.0f, 150.0f, 10.5f, true);
     Gracz gracz2(1800.0f, 465.0f, 40.0f, 150.0f, 10.5f, false);
     Kolo pilka(950.0f, 540.0f, 15.0f);
-    Points manager;
+    Manager manager;
 
     while(graDziala)
     {
