@@ -30,8 +30,16 @@ void Manager::rysuj(SDL_Renderer* renderer)
 
 bool Manager::koniecGry()
 {
-    if (punktyGracz1 >= 11 && punktyGracz1 - punktyGracz2 >= 2) return true;
-    if (punktyGracz2 >= 11 && punktyGracz2 - punktyGracz1 >= 2) return true;
+    if (punktyGracz1 >= 11 && punktyGracz1 - punktyGracz2 >= 2)
+    {
+        punktyGracz1 = 0, punktyGracz2 = 0;
+        return true;
+    } 
+    if (punktyGracz2 >= 11 && punktyGracz2 - punktyGracz1 >= 2)
+    {
+        punktyGracz1 = 0, punktyGracz2 = 0;
+        return true;
+    } 
 
     return false;
 }

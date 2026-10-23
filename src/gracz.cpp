@@ -73,10 +73,19 @@ void Kolo::czyKoliduje(const SDL_FRect& prostokat)
     if (dystans < (promien * promien))
     {
         predkoscX *= -1.0f;
+
+        float srodek = prostokat.y + (prostokat.h / 2.0f);
+        float offset = (y - srodek) / (prostokat.h / 2.0f);
+
+        offset = clamp(offset, -1.0f, 1.0f);
+
+        float maxSkos = 10.0f;
+        predkoscY = offset * maxSkos;
         
         if (x < prostokat.x + prostokat.w / 2) x = prostokat.x - promien - 1.0f;
         else x = prostokat.x + prostokat.w + promien + 1.0f;
     }
+
 }
 
 void Kolo::aktualizuj()

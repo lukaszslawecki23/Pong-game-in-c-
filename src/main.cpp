@@ -62,8 +62,15 @@ int main(int argc, char* argv[]) {
         { 255, 255, 255, 255 },
         { 200, 200, 200, 255 }
     };
+
+    Button przyciskWyjdz
+    {
+        { (1920.0f - 300.0f) / 2.0f, (1080.0f - 80.0f) / 2.0f, 300.0f, 80.0f },
+        { 255, 255, 255, 255 },
+        { 200, 200, 200, 255 }
+    };
     
-    while(graDziala && state != GameState::Exit)
+    while(state != GameState::Exit)
     {
         while(SDL_PollEvent(&event))
         {
@@ -71,12 +78,12 @@ int main(int argc, char* argv[]) {
 
             if (event.type == SDL_EVENT_QUIT)
             {
-                graDziala = false;
+                state = GameState::Exit;
             }
 
             if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE)
             {
-                graDziala = false;
+                state = GameState::Menu;
             }
 
             if (state == GameState::Menu)
@@ -85,6 +92,7 @@ int main(int argc, char* argv[]) {
                 {
                     SDL_FPoint pozycjaMyszy = { event.motion.x, event.motion.y };
                     przyciskGraj.isHoverd = SDL_PointInRectFloat(&pozycjaMyszy, &przyciskGraj.rect);
+                    przyciskWyjdz.isHoverd = SDL_PointInRectFloat(&pozycjaMyszy, &przyciskWyjdz.rect);
                 }
 
                 if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
@@ -97,6 +105,11 @@ int main(int argc, char* argv[]) {
                         {
                             state = GameState::Playing;
                         }
+
+                        if (SDL_PointInRectFloat(&click, &przyciskWyjdz.rect))
+                        {
+                            state = GameState::Exit;
+                        }
                     }
                 }
             }
@@ -108,8 +121,11 @@ int main(int argc, char* argv[]) {
             SDL_RenderClear(renderer);
 
             SDL_Color kolor = przyciskGraj.isHoverd ? przyciskGraj.hoverColor : przyciskGraj.baseColor;
+            SDL_Color kolor2 = przyciskWyjdz.isHoverd ? przyciskWyjdz.hoverColor : przyciskWyjdz.baseColor;
             SDL_SetRenderDrawColor(renderer, kolor.r, kolor.g, kolor.b, kolor.a);
             SDL_RenderFillRect(renderer, &przyciskGraj.rect);
+            SDL_SetRenderDrawColor(renderer, kolor2.r, kolor2.g, kolor2.b, kolor2.a);
+            SDL_RenderFillRect(renderer, &przyciskWyjdz.rect);
 
             SDL_RenderPresent(renderer);
         }
@@ -118,7 +134,14 @@ int main(int argc, char* argv[]) {
         {
             if (manager.czyGol(pilka))
             {
-                if (manager.koniecGry()) state = GameState::Menu;
+                if (manager.koniecGry()) 
+                {
+                    r = 30;
+                    g = 120;
+                    b = 90;
+                    
+                    state = GameState::Menu;
+                }
             
                 if (manager.punktyGracz1 > manager.punktyGracz2)
                 {
