@@ -13,6 +13,23 @@ struct Button
     SDL_Color baseColor;
     SDL_Color hoverColor;
     bool isHoverd = false;
+
+    void aktualizuj(const SDL_FPoint& mysz)
+    {
+        isHoverd = SDL_PointInRectFloat(&mysz, &rect);
+    }
+
+    bool czyKlikniety(const SDL_FPoint& click)
+    {
+        return SDL_PointInRectFloat(&click, &rect);
+    }
+
+    void rysuj(SDL_Renderer* renderer) const
+    {
+        const SDL_Color& kolor = isHoverd ? hoverColor : baseColor;
+        SDL_SetRenderDrawColor(renderer, kolor.r, kolor.g, kolor.b, kolor.a);
+        SDL_RenderFillRect(renderer, &rect);
+    }
 };
 
 int main(int argc, char* argv[]) {
@@ -46,10 +63,9 @@ int main(int argc, char* argv[]) {
     SDL_SetRenderLogicalPresentation(renderer, 1920, 1080, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
     GameState state = GameState::Menu;
-    bool graDziala = true;
     SDL_Event event;
 
-    int r = 30, g = 120, b = 90;
+    SDL_Color tloGry = { 30, 120, 90, 255 };
 
     Gracz gracz1(80.0f, 465.0f, 40.0f, 150.0f, 10.5f, true);
     Gracz gracz2(1800.0f, 465.0f, 40.0f, 150.0f, 10.5f, false);
@@ -91,8 +107,8 @@ int main(int argc, char* argv[]) {
                 if (event.type == SDL_EVENT_MOUSE_MOTION)
                 {
                     SDL_FPoint pozycjaMyszy = { event.motion.x, event.motion.y };
-                    przyciskGraj.isHoverd = SDL_PointInRectFloat(&pozycjaMyszy, &przyciskGraj.rect);
-                    przyciskWyjdz.isHoverd = SDL_PointInRectFloat(&pozycjaMyszy, &przyciskWyjdz.rect);
+                    przyciskGraj.aktualizuj(pozycjaMyszy);
+                    przyciskWyjdz.aktualizuj(pozycjaMyszy);
                 }
 
                 if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
@@ -101,12 +117,12 @@ int main(int argc, char* argv[]) {
                     {
                         SDL_FPoint click = {event.button.x, event.button.y};
 
-                        if (SDL_PointInRectFloat(&click, &przyciskGraj.rect))
+                        if (przyciskGraj.czyKlikniety(click))
                         {
                             state = GameState::Playing;
                         }
 
-                        if (SDL_PointInRectFloat(&click, &przyciskWyjdz.rect))
+                        if (przyciskWyjdz.czyKlikniety(click))
                         {
                             state = GameState::Exit;
                         }
@@ -120,12 +136,8 @@ int main(int argc, char* argv[]) {
             SDL_SetRenderDrawColor(renderer, 30, 120, 90, 255);
             SDL_RenderClear(renderer);
 
-            SDL_Color kolor = przyciskGraj.isHoverd ? przyciskGraj.hoverColor : przyciskGraj.baseColor;
-            SDL_Color kolor2 = przyciskWyjdz.isHoverd ? przyciskWyjdz.hoverColor : przyciskWyjdz.baseColor;
-            SDL_SetRenderDrawColor(renderer, kolor.r, kolor.g, kolor.b, kolor.a);
-            SDL_RenderFillRect(renderer, &przyciskGraj.rect);
-            SDL_SetRenderDrawColor(renderer, kolor2.r, kolor2.g, kolor2.b, kolor2.a);
-            SDL_RenderFillRect(renderer, &przyciskWyjdz.rect);
+            przyciskGraj.rysuj(renderer);
+            przyciskWyjdz.rysuj(renderer);
 
             SDL_RenderPresent(renderer);
         }
@@ -136,24 +148,18 @@ int main(int argc, char* argv[]) {
             {
                 if (manager.koniecGry()) 
                 {
-                    r = 30;
-                    g = 120;
-                    b = 90;
-                    
+                    tloGry = { 30, 120, 90, 255 };
+
                     state = GameState::Menu;
                 }
             
                 if (manager.punktyGracz1 > manager.punktyGracz2)
                 {
-                    r = 30;
-                    g = 120;
-                    b = 90;
+                    tloGry = { 30, 120, 90, 255 };
                 }
                 if (manager.punktyGracz1 < manager.punktyGracz2)
                 {
-                    r = 90;
-                    g = 30;
-                    b = 30;
+                    tloGry = { 90, 30, 30, 255 };
                 }
                 pilka.resetuj();
             }
@@ -165,7 +171,7 @@ int main(int argc, char* argv[]) {
             pilka.czyKoliduje(gracz1.pobierzCialo());
             pilka.czyKoliduje(gracz2.pobierzCialo());
 
-            SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+            SDL_SetRenderDrawColor(renderer, tloGry.r, tloGry.g, tloGry.b, 255);
             SDL_RenderClear(renderer);
 
             gracz1.rysuj(renderer);
