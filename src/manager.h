@@ -13,3 +13,10 @@ class Manager
         void rysuj(SDL_Renderer* renderer);
         bool koniecGry();
 };
+
+enum class GameState
+{
+    Menu,
+    Playing,
+    Exit
+};

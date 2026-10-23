@@ -1,4 +1,5 @@
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 #include <iostream>
 #include <algorithm>
 #include "gracz.h"
@@ -6,7 +7,13 @@
 using std::endl;
 using std::cerr;
 
-
+struct Button
+{
+    SDL_FRect rect;
+    SDL_Color baseColor;
+    SDL_Color hoverColor;
+    bool isHoverd = false;
+};
 
 int main(int argc, char* argv[]) {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -27,7 +34,7 @@ int main(int argc, char* argv[]) {
     }
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, nullptr);
-    SDL_SetRenderLogicalPresentation(renderer, 1920, 1080, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    
     if (!renderer)
     {
         cerr << "Blad przy tworzeniu obiektu" << SDL_GetError() << endl;
@@ -36,6 +43,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    SDL_SetRenderLogicalPresentation(renderer, 1920, 1080, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
+    GameState state = GameState::Menu;
     bool graDziala = true;
     SDL_Event event;
 
@@ -46,10 +56,19 @@ int main(int argc, char* argv[]) {
     Kolo pilka(950.0f, 540.0f, 15.0f);
     Manager manager;
 
-    while(graDziala)
+    Button przyciskGraj 
+    { 
+        { (1920.0f - 300.0f) / 2.0f, (1080.0f - 80.0f) / 4.0f, 300.0f, 80.0f },
+        { 255, 255, 255, 255 },
+        { 200, 200, 200, 255 }
+    };
+    
+    while(graDziala && state != GameState::Exit)
     {
         while(SDL_PollEvent(&event))
         {
+            SDL_ConvertEventToRenderCoordinates(renderer, &event);
+
             if (event.type == SDL_EVENT_QUIT)
             {
                 graDziala = false;
@@ -59,44 +78,82 @@ int main(int argc, char* argv[]) {
             {
                 graDziala = false;
             }
+
+            if (state == GameState::Menu)
+            {
+                if (event.type == SDL_EVENT_MOUSE_MOTION)
+                {
+                    SDL_FPoint pozycjaMyszy = { event.motion.x, event.motion.y };
+                    przyciskGraj.isHoverd = SDL_PointInRectFloat(&pozycjaMyszy, &przyciskGraj.rect);
+                }
+
+                if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+                {
+                    if (event.button.button == SDL_BUTTON_LEFT)
+                    {
+                        SDL_FPoint click = {event.button.x, event.button.y};
+
+                        if (SDL_PointInRectFloat(&click, &przyciskGraj.rect))
+                        {
+                            state = GameState::Playing;
+                        }
+                    }
+                }
+            }
         }
 
-        if (manager.czyGol(pilka))
+        if (state == GameState::Menu)
         {
-            if (manager.koniecGry()) graDziala = false;
-        
-            if (manager.punktyGracz1 > manager.punktyGracz2)
-            {
-                r = 30;
-                g = 120;
-                b = 90;
-            }
-            if (manager.punktyGracz1 < manager.punktyGracz2)
-            {
-                r = 90;
-                g = 30;
-                b = 30;
-            }
-            pilka.resetuj();
+            SDL_SetRenderDrawColor(renderer, 30, 120, 90, 255);
+            SDL_RenderClear(renderer);
+
+            SDL_Color kolor = przyciskGraj.isHoverd ? przyciskGraj.hoverColor : przyciskGraj.baseColor;
+            SDL_SetRenderDrawColor(renderer, kolor.r, kolor.g, kolor.b, kolor.a);
+            SDL_RenderFillRect(renderer, &przyciskGraj.rect);
+
+            SDL_RenderPresent(renderer);
         }
 
-        gracz1.aktualizuj();
-        gracz2.aktualizuj();
-        pilka.aktualizuj();
+        else if (state == GameState::Playing)
+        {
+            if (manager.czyGol(pilka))
+            {
+                if (manager.koniecGry()) state = GameState::Menu;
+            
+                if (manager.punktyGracz1 > manager.punktyGracz2)
+                {
+                    r = 30;
+                    g = 120;
+                    b = 90;
+                }
+                if (manager.punktyGracz1 < manager.punktyGracz2)
+                {
+                    r = 90;
+                    g = 30;
+                    b = 30;
+                }
+                pilka.resetuj();
+            }
 
-        pilka.czyKoliduje(gracz1.pobierzCialo());
-        pilka.czyKoliduje(gracz2.pobierzCialo());
+            gracz1.aktualizuj();
+            gracz2.aktualizuj();
+            pilka.aktualizuj();
 
-        SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-        SDL_RenderClear(renderer);
+            pilka.czyKoliduje(gracz1.pobierzCialo());
+            pilka.czyKoliduje(gracz2.pobierzCialo());
 
-        gracz1.rysuj(renderer);
-        gracz2.rysuj(renderer);
-        pilka.rysuj(renderer);
-        manager.rysuj(renderer);
+            SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+            SDL_RenderClear(renderer);
 
-        SDL_RenderPresent(renderer);
+            gracz1.rysuj(renderer);
+            gracz2.rysuj(renderer);
+            pilka.rysuj(renderer);
+            manager.rysuj(renderer);
+
+            SDL_RenderPresent(renderer);
+        }
         SDL_Delay(16);
+
     }
 
     SDL_DestroyRenderer(renderer);
