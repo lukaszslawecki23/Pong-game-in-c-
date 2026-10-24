@@ -11,7 +11,9 @@ add_subdirectory(external/SDL_image)
 
 add_executable(${PROJECT_NAME} src/main.cpp
     src/gracz.cpp
-    src/manager.cpp)
+    src/manager.cpp
+    src/sound.h
+    src/sound.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     SDL3::SDL3

@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 #include <algorithm>
 #include <cstdlib>
+#include "sound.h"
 using std::clamp;
 
 class Gracz
@@ -29,8 +30,8 @@ class Kolo
     public:
         Kolo(float srodekX, float srodekY, float r);
         void rysuj(SDL_Renderer* renderer);
-        void czyKoliduje(const SDL_FRect& prostokat);
-        void aktualizuj();
+        void czyKoliduje(const SDL_FRect& prostokat, Sound dzwiek);
+        void aktualizuj(Sound dzwiek);
         void resetuj();
         float polozenieX();
 };

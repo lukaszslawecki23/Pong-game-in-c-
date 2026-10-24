@@ -60,7 +60,7 @@ void Kolo::rysuj(SDL_Renderer* renderer)
     }
 }
 
-void Kolo::czyKoliduje(const SDL_FRect& prostokat)
+void Kolo::czyKoliduje(const SDL_FRect& prostokat, Sound dzwiek)
 {
     float najblizszeX = clamp(x, prostokat.x, prostokat.x + prostokat.w);
     float najblizszeY = clamp(y, prostokat.y, prostokat.y + prostokat.h);
@@ -72,6 +72,7 @@ void Kolo::czyKoliduje(const SDL_FRect& prostokat)
 
     if (dystans < (promien * promien))
     {
+        dzwiek.otworz();
         predkoscX *= -1.0f;
 
         float srodek = prostokat.y + (prostokat.h / 2.0f);
@@ -88,7 +89,7 @@ void Kolo::czyKoliduje(const SDL_FRect& prostokat)
 
 }
 
-void Kolo::aktualizuj()
+void Kolo::aktualizuj(Sound dzwiek)
 {
     const bool* klawisze = SDL_GetKeyboardState(nullptr);
     if (klawisze[SDL_SCANCODE_SPACE] && !wRuchu)
@@ -109,12 +110,14 @@ void Kolo::aktualizuj()
 
         if (y - promien <= 0.0f)
         {
+            dzwiek.otworz();
             y = promien;
             predkoscY *= -1.0f;
         }
 
         if (y + promien >= 1080.0f)
         {
+            dzwiek.otworz();
             y = 1080.0f - promien;
             predkoscY *= -1.0f;
         }

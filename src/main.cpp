@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "gracz.h"
 #include "manager.h"
+#include "sound.h"
 using std::endl;
 using std::cerr;
 
@@ -47,18 +48,20 @@ struct Button
 };
 
 int main(int argc, char* argv[]) {
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
+    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) 
+    {
         cerr << "Blad SDL_Init: " << SDL_GetError() << endl;
         return 1;
     }
 
     SDL_Window* window = SDL_CreateWindow(
-        "Moja gra",
+        "Pong",
         1920, 1080,
         0
     );
 
-    if (!window) {
+    if (!window) 
+    {
         cerr << "Blad tworzenia okna: " << SDL_GetError() << endl;
         SDL_Quit();
         return 1;
@@ -88,7 +91,7 @@ int main(int argc, char* argv[]) {
 
     Button przyciskGraj 
     { 
-        { (1920.0f - 300.0f) / 2.0f, (1080.0f - 80.0f) / 4.0f, 300.0f, 80.0f },
+        { (1920.0f - 300.0f) / 2.0f, (1080.0f - 80.0f) / 3.0f, 300.0f, 80.0f },
         IMG_LoadTexture(renderer, "texture/playButton.png"),
         IMG_LoadTexture(renderer, "texture/playButtonHover.png")
     };
@@ -99,6 +102,9 @@ int main(int argc, char* argv[]) {
         IMG_LoadTexture(renderer, "texture/exitButton.png"),
         IMG_LoadTexture(renderer, "texture/exitButtonHover.png")
     };
+
+    Sound dzwiek;
+    dzwiek.wczytaj("texture/hitHurt.wav");
     
     while(state != GameState::Exit)
     {
@@ -180,10 +186,10 @@ int main(int argc, char* argv[]) {
 
             gracz1.aktualizuj();
             gracz2.aktualizuj();
-            pilka.aktualizuj();
+            pilka.aktualizuj(dzwiek);
 
-            pilka.czyKoliduje(gracz1.pobierzCialo());
-            pilka.czyKoliduje(gracz2.pobierzCialo());
+            pilka.czyKoliduje(gracz1.pobierzCialo(), dzwiek);
+            pilka.czyKoliduje(gracz2.pobierzCialo(), dzwiek);
 
             SDL_SetRenderDrawColor(renderer, tloGry.r, tloGry.g, tloGry.b, 255);
             SDL_RenderClear(renderer);
