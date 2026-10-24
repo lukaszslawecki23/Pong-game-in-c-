@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <SDL3_image/SDL_image.h>
 #include <iostream>
 #include <algorithm>
 #include "gracz.h"
@@ -10,8 +11,8 @@ using std::cerr;
 struct Button
 {
     SDL_FRect rect;
-    SDL_Color baseColor;
-    SDL_Color hoverColor;
+    SDL_Texture *texture;
+    SDL_Texture *textureHover;
     bool isHoverd = false;
 
     void aktualizuj(const SDL_FPoint& mysz)
@@ -26,9 +27,22 @@ struct Button
 
     void rysuj(SDL_Renderer* renderer) const
     {
-        const SDL_Color& kolor = isHoverd ? hoverColor : baseColor;
-        SDL_SetRenderDrawColor(renderer, kolor.r, kolor.g, kolor.b, kolor.a);
-        SDL_RenderFillRect(renderer, &rect);
+        SDL_Texture *aktywna = (isHoverd && textureHover) ? textureHover : texture;
+        if (aktywna)
+        {
+            SDL_RenderTexture(renderer, aktywna, NULL, &rect);
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(renderer, isHoverd ? 200 : 255, 200, 200, 255);
+            SDL_RenderFillRect(renderer, &rect);
+        }
+    }
+
+    void zniszcz()
+    {
+        if (texture) SDL_DestroyTexture(texture);
+        if (textureHover) SDL_DestroyTexture(textureHover);
     }
 };
 
@@ -75,15 +89,15 @@ int main(int argc, char* argv[]) {
     Button przyciskGraj 
     { 
         { (1920.0f - 300.0f) / 2.0f, (1080.0f - 80.0f) / 4.0f, 300.0f, 80.0f },
-        { 255, 255, 255, 255 },
-        { 200, 200, 200, 255 }
+        IMG_LoadTexture(renderer, "texture/playButton.png"),
+        IMG_LoadTexture(renderer, "texture/playButtonHover.png")
     };
 
     Button przyciskWyjdz
     {
         { (1920.0f - 300.0f) / 2.0f, (1080.0f - 80.0f) / 2.0f, 300.0f, 80.0f },
-        { 255, 255, 255, 255 },
-        { 200, 200, 200, 255 }
+        IMG_LoadTexture(renderer, "texture/exitButton.png"),
+        IMG_LoadTexture(renderer, "texture/exitButtonHover.png")
     };
     
     while(state != GameState::Exit)
@@ -184,6 +198,9 @@ int main(int argc, char* argv[]) {
         SDL_Delay(16);
 
     }
+
+    przyciskGraj.zniszcz();
+    przyciskWyjdz.zniszcz();
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
