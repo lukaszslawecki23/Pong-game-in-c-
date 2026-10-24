@@ -84,8 +84,8 @@ int main(int argc, char* argv[]) {
 
     SDL_Color tloGry = { 30, 120, 90, 255 };
 
-    Gracz gracz1(80.0f, 465.0f, 40.0f, 150.0f, 10.5f, true);
-    Gracz gracz2(1800.0f, 465.0f, 40.0f, 150.0f, 10.5f, false);
+    Gracz gracz1(80.0f, 465.0f, 40.0f, 150.0f, true);
+    Gracz gracz2(1800.0f, 465.0f, 40.0f, 150.0f, false);
     Kolo pilka(950.0f, 540.0f, 15.0f);
     Manager manager;
 
@@ -103,8 +103,10 @@ int main(int argc, char* argv[]) {
         IMG_LoadTexture(renderer, "texture/exitButtonHover.png")
     };
 
-    Sound dzwiek;
-    dzwiek.wczytaj("texture/hitHurt.wav");
+    Sound dzwiekUderzenia;
+    dzwiekUderzenia.wczytaj("texture/hitHurt.wav");
+    Sound dzwiekGol;
+    dzwiekGol.wczytaj("texture/gol.wav");
     
     while(state != GameState::Exit)
     {
@@ -166,6 +168,8 @@ int main(int argc, char* argv[]) {
         {
             if (manager.czyGol(pilka))
             {
+                dzwiekGol.otworz();
+                
                 if (manager.koniecGry()) 
                 {
                     tloGry = { 30, 120, 90, 255 };
@@ -186,10 +190,10 @@ int main(int argc, char* argv[]) {
 
             gracz1.aktualizuj();
             gracz2.aktualizuj();
-            pilka.aktualizuj(dzwiek);
+            pilka.aktualizuj(dzwiekUderzenia);
 
-            pilka.czyKoliduje(gracz1.pobierzCialo(), dzwiek);
-            pilka.czyKoliduje(gracz2.pobierzCialo(), dzwiek);
+            pilka.czyKoliduje(gracz1.pobierzCialo(), dzwiekUderzenia);
+            pilka.czyKoliduje(gracz2.pobierzCialo(), dzwiekUderzenia);
 
             SDL_SetRenderDrawColor(renderer, tloGry.r, tloGry.g, tloGry.b, 255);
             SDL_RenderClear(renderer);

@@ -2,30 +2,55 @@
 #include <algorithm>
 #include <random>
 
-Gracz::Gracz(float start_x, float start_y, float szerokosc, float wysokosc, float predkosc, bool wsad)
+Gracz::Gracz(float start_x, float start_y, float szerokosc, float wysokosc, bool wsad)
 {
     cialo = { start_x, start_y, szerokosc, wysokosc };
-    predkoscGracza = predkosc;
     this->wsad = wsad;
 }
 
 void Gracz::aktualizuj()
 {
     const bool* klawisze = SDL_GetKeyboardState(nullptr);
+    float kierunekY = 0.0f;
 
     if (wsad)
     {
-        if (klawisze[SDL_SCANCODE_W]) cialo.y -= predkoscGracza;
-        if (klawisze[SDL_SCANCODE_S]) cialo.y += predkoscGracza;
+        if (klawisze[SDL_SCANCODE_W]) kierunekY -= 1.0f;
+        if (klawisze[SDL_SCANCODE_S]) kierunekY += 1.0f;
     }
     else
     {
-        if (klawisze[SDL_SCANCODE_UP]) cialo.y -= predkoscGracza;
-        if (klawisze[SDL_SCANCODE_DOWN]) cialo.y += predkoscGracza;
+        if (klawisze[SDL_SCANCODE_UP]) kierunekY -= 1.0f;
+        if (klawisze[SDL_SCANCODE_DOWN]) kierunekY += 1.0f;
     }
 
-    if (cialo.y <= 1.0f) cialo.y = 1.0f;
-    if (cialo.y >= 929.0f) cialo.y = 929.0f;
+    if (kierunekY != 0.0f)
+    {
+        predkoscGracza += kierunekY * przyspieszenie;
+        predkoscGracza = clamp(predkoscGracza, -maxPredkosc, maxPredkosc);
+    }
+    else
+    {
+        predkoscGracza *= tarcie;
+
+        if (abs(predkoscGracza) < 0.05f)
+        {
+            predkoscGracza = 0.0f;
+        }
+    }
+
+    cialo.y += predkoscGracza;
+
+    if (cialo.y <= 1.0f)
+    {
+        cialo.y = 1.0f;
+        predkoscGracza = 0.0f;
+    }
+    else if (cialo.y >= 929.0f)
+    {
+        cialo.y = 929.0f;
+        predkoscGracza = 0.0f;
+    }
     
 }
 

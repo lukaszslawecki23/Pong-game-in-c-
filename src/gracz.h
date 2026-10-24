@@ -9,11 +9,14 @@ class Gracz
 {
     private:
         SDL_FRect cialo;
-        float predkoscGracza;
+        float predkoscGracza = 0.0f;
+        float maxPredkosc = 18.5f;
+        float przyspieszenie = 1.5f;
+        float tarcie = 0.8f;
         bool wsad;
     
     public:
-        Gracz(float start_x, float start_y, float szerokosc, float wysokosc, float predkosc, bool wsad);
+        Gracz(float start_x, float start_y, float szerokosc, float wysokosc, bool wsad);
         void aktualizuj();
         void rysuj(SDL_Renderer* renderer);
         const SDL_FRect& pobierzCialo() const { return cialo; }
